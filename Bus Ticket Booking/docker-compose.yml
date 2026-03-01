@@ -1,0 +1,101 @@
+version: "3.9"
+
+services:
+  # ─── PostgreSQL ────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: routexen_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: routexen_user
+      POSTGRES_PASSWORD: routexen_pass
+      POSTGRES_DB: routexen_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U routexen_user -d routexen_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis ─────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: routexen_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── FastAPI Backend ───────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: routexen_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "
+        echo 'Waiting for DB...' &&
+        sleep 3 &&
+        alembic upgrade head &&
+        python seed.py &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  # ─── Celery Worker ─────────────────────────────────────────────────
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: routexen_celery
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: celery -A app.workers.tasks worker --loglevel=info --concurrency=2
+
+  # ─── React Frontend ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: routexen_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - backend
+    stdin_open: true
+
+volumes:
+  postgres_data:

@@ -1,0 +1,32 @@
+# =============================================================================
+#  Systemd Service — Flight Ticket Booking (Docker Compose)
+# =============================================================================
+#  Install:
+#    sudo cp deploy/flight-booking.service /etc/systemd/system/
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable flight-booking
+#    sudo systemctl start flight-booking
+#
+#  Commands:
+#    sudo systemctl status flight-booking
+#    sudo journalctl -u flight-booking -f
+# =============================================================================
+
+[Unit]
+Description=Flight Ticket Booking Application (Docker Compose)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/ubuntu/flight_booking
+ExecStart=/usr/bin/docker compose -f docker-compose.prod.yml up -d --build
+ExecStop=/usr/bin/docker compose -f docker-compose.prod.yml down
+ExecReload=/usr/bin/docker compose -f docker-compose.prod.yml up -d --build
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
