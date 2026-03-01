@@ -1,0 +1,80 @@
+# =============================================================================
+#  Flight Ticket Booking – Docker Compose (Production)
+# =============================================================================
+#  Prerequisites:
+#    1. Existing containers: ticket_postgres, redis-server
+#    2. External network:    docker network create ticket-net
+#    3. Connect containers:  docker network connect ticket-net ticket_postgres
+#                            docker network connect ticket-net redis-server
+#
+#  Start everything:   docker compose up --build
+#  Stop everything:    docker compose down
+# =============================================================================
+
+services:
+  # ── FastAPI Backend ────────────────────────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: flight_backend
+    restart: unless-stopped
+    env_file: .env.docker
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: [ "CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/')\"" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - ticket-net
+
+  # ── React + Vite Frontend (Nginx) ──────────────────────────────────────────
+  frontend:
+    build: ./Frontend
+    container_name: flight_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ticket-net
+
+  # ── Celery Worker ──────────────────────────────────────────────────────────
+  celery-worker:
+    build: ./backend
+    container_name: flight_celery_worker
+    restart: unless-stopped
+    command: celery -A celery_app worker --loglevel=info --pool=solo --concurrency=1
+    working_dir: /app
+    env_file: .env.docker
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ticket-net
+
+  # ── Celery Beat (scheduler) ────────────────────────────────────────────────
+  celery-beat:
+    build: ./backend
+    container_name: flight_celery_beat
+    restart: unless-stopped
+    command: celery -A celery_app beat --loglevel=info
+    working_dir: /app
+    env_file: .env.docker
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ticket-net
+
+# ── External Network ──────────────────────────────────────────────────────────
+# ticket-net must be created BEFORE running docker compose up:
+#   docker network create ticket-net
+#   docker network connect ticket-net ticket_postgres
+#   docker network connect ticket-net redis-server
+networks:
+  ticket-net:
+    external: true

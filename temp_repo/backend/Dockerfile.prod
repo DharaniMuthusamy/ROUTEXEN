@@ -1,0 +1,29 @@
+# =============================================================================
+#  Backend Dockerfile — Production (Uvicorn only, no Gunicorn)
+# =============================================================================
+FROM python:3.11-slim-bookworm
+
+# Prevent .pyc files and enable unbuffered stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+
+
+# Install Python dependencies (layer caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+EXPOSE 8000
+
+# Production: Uvicorn with 2 workers
+CMD ["uvicorn", "main:app", \
+    "--host", "0.0.0.0", \
+    "--port", "8000", \
+    "--workers", "2", \
+    "--log-level", "info", \
+    "--access-log"]
