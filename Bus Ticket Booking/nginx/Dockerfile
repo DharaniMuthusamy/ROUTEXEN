@@ -1,15 +1,15 @@
-# ── Stage 1: Build Frontend (Debian/glibc) ───────────────────────────────────
+# ── Stage 1: Build frontend (Debian/glibc) ───────────────────────────────────
 FROM node:20-bookworm-slim AS frontend-build
 WORKDIR /app
 
 # Copy ONLY package.json (ignore Windows package-lock)
-COPY Frontend/package.json ./
+COPY frontend/package.json ./
 
 # Install deps (this generates correct Linux optional deps)
 RUN npm install --no-audit --no-fund
 
 # Copy app source
-COPY Frontend/ .
+COPY frontend/ .
 
 # Build
 RUN npm run build
