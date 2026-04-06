@@ -9,7 +9,11 @@ from app.models import User, Bus, Booking, Payment, Notification  # noqa: F401
 from app.routes import auth, buses, bookings, payments, notifications, reports, places
 
 # Create tables (used with alembic in prod, direct for dev convenience)
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not create tables on startup: {e}")
+    print("Tables should be created via Alembic migrations")
 
 app = FastAPI(
     title="RouteXen API",
