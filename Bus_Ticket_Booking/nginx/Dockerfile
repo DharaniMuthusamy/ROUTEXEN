@@ -1,4 +1,4 @@
-# ── Stage 1: Build Frontend (Debian/glibc) ───────────────────────────────────
+# ── Stage 1: Build frontend (Debian/glibc) ───────────────────────────────────
 FROM node:20-bookworm-slim AS frontend-build
 WORKDIR /app
 

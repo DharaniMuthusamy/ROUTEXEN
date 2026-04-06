@@ -27,3 +27,4 @@ CMD ["uvicorn", "app.main:app", \
     "--workers", "2", \
     "--log-level", "info", \
     "--access-log"]
+
