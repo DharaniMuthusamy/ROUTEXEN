@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Plane, Briefcase, Clock, Calendar, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback.jsx';
 import { motion } from 'motion/react';
-import { getFlightById, apiFlightToFrontend } from '../utils/api.js';
+import { getFlightById, apiFlightToFrontend } from '../../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { LoginModal } from '../components/LoginModal.jsx';
 

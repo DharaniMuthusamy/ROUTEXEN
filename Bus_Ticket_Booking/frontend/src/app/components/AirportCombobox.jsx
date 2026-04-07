@@ -9,7 +9,7 @@ import {
     CommandGroup,
     CommandItem,
 } from './ui/command.jsx';
-import { getAirports } from '../utils/api.js';
+import { getAirports } from '../../services/api.js';
 
 const FALLBACK_AIRPORTS = [
     { code: 'MAA', name: 'Chennai International Airport', city: 'Chennai' },

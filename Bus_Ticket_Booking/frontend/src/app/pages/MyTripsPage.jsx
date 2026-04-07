@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Plane, Calendar, MapPin, X, CheckCircle, LogIn, AlertCircle, Loader2, ArrowLeft, Home } from 'lucide-react';
-import { getMyTrips, cancelBooking, getToken } from '../utils/api.js';
+import { getMyTrips, cancelBooking, getToken } from '../../services/api.js';
 
 export function MyTripsPage() {
     const navigate = useNavigate();

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import {
     getToken, setToken, removeToken, getMe,
     login as apiLogin, signup as apiSignup,
-} from '../utils/api.js';
+} from '../../services/api.js';
 
 const AuthContext = createContext(null);
 

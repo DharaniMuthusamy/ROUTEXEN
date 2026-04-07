@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Timer, CheckCircle2, AlertCircle, X, ArrowRight } from 'lucide-react';
-import { getSeats, holdSeat, releaseSeat, getHoldStatus, getToken } from '../utils/api.js';
+import { getSeats, holdSeat, releaseSeat, getHoldStatus, getToken } from '../../services/api.js';
 
 // ── SVG Seat Component ──────────────────────────────────────────────
 function SeatIcon({ fill, stroke, label, isSelected }) {

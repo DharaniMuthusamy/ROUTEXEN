@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { CreditCard, Smartphone, Building2, Lock, CheckCircle } from 'lucide-react';
-import { createBooking } from '../utils/api.js';
+import { createBooking } from '../../services/api.js';
 
 export function PaymentPage() {
     const navigate = useNavigate();

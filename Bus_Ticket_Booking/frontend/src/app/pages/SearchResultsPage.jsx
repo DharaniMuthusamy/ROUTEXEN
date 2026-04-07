@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { ChevronRight, Plane, Clock, SlidersHorizontal, X } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback.jsx';
-import { searchFlights, apiFlightToFrontend } from '../utils/api.js';
+import { searchFlights, apiFlightToFrontend } from '../../services/api.js';
 
 export function SearchResultsPage() {
     const navigate = useNavigate();

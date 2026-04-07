@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown, Search, X } from 'lucide-react';
-import { getAirports } from '../utils/api.js';
+import { getAirports } from '../../services/api.js';
 
 export function AirportDropdown({ value, onChange, label, placeholder = 'Search city or airport...' }) {
     const [airports, setAirports] = useState([]);
